@@ -17,6 +17,13 @@ class StatusPage extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.message),
+        onPressed: () {
+          socketService.emit('emitir-mensaje',
+              {'nombre': 'Flutter', 'mensaje': 'Hola desde Flutter'});
+        },
+      ),
     );
   }
 }
