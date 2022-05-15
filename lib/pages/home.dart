@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:provider/provider.dart';
 
 import 'package:socketio_app/models/band.dart';
@@ -70,9 +71,16 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(color: Colors.black87),
         ),
       ),
-      body: ListView.builder(
-        itemBuilder: (_, i) => _bandTile(bands[i]),
-        itemCount: bands.length,
+      body: Column(
+        children: [
+          _showGraph(),
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (_, i) => _bandTile(bands[i]),
+              itemCount: bands.length,
+            ),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         elevation: 1,
@@ -174,5 +182,51 @@ class _HomePageState extends State<HomePage> {
     }
 
     Navigator.pop(context);
+  }
+
+  Widget _showGraph() {
+    Map<String, double> dataMap = {};
+
+    // ignore: avoid_function_literals_in_foreach_calls
+    bands.forEach((band) {
+      dataMap.putIfAbsent(band.name, () => band.votes.toDouble());
+    });
+
+    final List<Color> colorList = [
+      Colors.blue,
+      Colors.pink,
+      Colors.yellowAccent,
+      Colors.orangeAccent,
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      height: 250,
+      child: PieChart(
+        animationDuration: const Duration(milliseconds: 800),
+        chartLegendSpacing: 32,
+        chartRadius: MediaQuery.of(context).size.width / 2.5,
+        chartType: ChartType.ring,
+        chartValuesOptions: const ChartValuesOptions(
+          showChartValueBackground: true,
+          showChartValues: true,
+          showChartValuesInPercentage: true,
+          showChartValuesOutside: true,
+          decimalPlaces: 1,
+        ),
+        colorList: colorList,
+        dataMap: dataMap,
+        initialAngleInDegree: 0,
+        ringStrokeWidth: 32,
+        legendOptions: const LegendOptions(
+          legendTextStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+          legendPosition: LegendPosition.right,
+          showLegends: true,
+          showLegendsInRow: false,
+        ),
+      ),
+    );
   }
 }
